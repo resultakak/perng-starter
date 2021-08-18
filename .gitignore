@@ -1,0 +1,6 @@
+.archives
+.vscode
+.idea
+node_modules
+.nosync
+.env

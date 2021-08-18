@@ -1,0 +1,53 @@
+{
+  "name": "@resultakak/perng-server",
+  "version": "1.0.0",
+  "description": "PERNG Server",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "migrate": "npx sequelize-cli db:migrate",
+    "test": "jest src/tests",
+    "start": "node src/server.js",
+    "start:dev": "nodemon src/server --exec babel-node -e js",
+    "lint": "eslint .",
+    "debug": "nodemon --inspect=0.0.0.0:9229 src/server.js"
+  },
+  "keywords": [
+    "perng"
+  ],
+  "author": "Resul Takak",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.7.1",
+    "apollo-server": "^2.21.1",
+    "apollo-server-express": "^2.21.1",
+    "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.5",
+    "core-js": "^3.9.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.5.0",
+    "nodemon": "^2.0.7",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.5.0",
+    "serve-favicon": "^2.5.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-security": "^1.4.0",
+    "faker": "^5.5.2",
+    "jest": "^26.6.3",
+    "sequelize-cli": "^6.2.0"
+  }
+}
