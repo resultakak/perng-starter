@@ -1,40 +1,50 @@
 require("dotenv").config();
 const { UserInputError, AuthenticationError } = require("apollo-server");
-const jsonwebtoken = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+import jsonwebtoken from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import md5 from "md5";
 const { v4: uuidv4 } = require("uuid");
-import config from "./../config";
 
+import config from "./../config";
 const { errors } = require("./../lib");
 import { User } from "../models";
 
 const resolvers = {
   AuthPayload: {
-    async user({ id }, _) {
-      return await User.findOne({ where: { id } });
+    async user({ user }, _) {
+      return await User.findOne({ where: { id: user.id } });
     },
   },
   Query: {
-    async me(_, args, { user }) {
+    async me(_, args, { user, cache }, info) {
       if (!user) {
-        throw new AuthenticationError("You are not authenticated");
+        throw new AuthenticationError(errors.YOU_ARE_NOT_AUTH);
       }
 
       if (!user) {
-        throw new UserInputError("You are not authenticated!");
+        throw new UserInputError(errors.YOU_ARE_NOT_AUTH);
+      }
+
+      const cache_id = md5(user.email);
+
+      let control = await cache.get(`me:${cache_id}`)
+      if(control) {
+        return JSON.parse(control);
       }
 
       user = await User.findByPk(user.id);
-
       if (!user) {
-        throw new Error("You are not authenticated!");
+        throw new Error(errors.USER_NOT_EXIST);
       }
+
+      user.password = false;
+      cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", 3600)
 
       return user;
     },
   },
   Mutation: {
-    async registerUser(_, { input }) {
+    async registerUser(_, { input }, { cache }) {
       try {
         const { email, password, name, surname } = input;
 
@@ -74,16 +84,22 @@ const resolvers = {
           { expiresIn: "10m" },
         );
 
+        const cache_id = md5(user.email);
+        user.password = false;
+        cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", 3600)
+
         return {
           token,
-          id: user.id,
+          user
         };
       } catch (error) {
         throw new Error(error.message);
       }
     },
-    async login(_, { email, password }, { ip }) {
+    async login(_, { input }, { cache, ip }) {
       try {
+        const { email, password } = input;
+
         const user = await User.findByLogin(email);
 
         if (!user) {
@@ -102,6 +118,10 @@ const resolvers = {
           { expiresIn: "1d" },
         );
 
+        const cache_id = md5(user.email);
+        user.password = false;
+        cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", 3600)
+
         return {
           token, user,
         };
@@ -109,14 +129,14 @@ const resolvers = {
         throw new Error(error.message);
       }
     },
-    async updateMe(_, { input }, { user }) {
+    async updateMe(_, { input }, { user, cache }) {
       if (!user) {
         throw new AuthenticationError("You are not authenticated");
       }
 
       const where = { id: user.id };
 
-      const me = await models.User.findOne({ where });
+      const me = await User.findOne({ where });
 
       if (!me) {
         throw new UserInputError("Account not found");
@@ -124,9 +144,13 @@ const resolvers = {
 
       input.email = me.email;
 
-      await models.User.update({ ...input }, { where, limit: 1 });
+      await User.update({ ...input }, { where, limit: 1 });
 
       await me.reload();
+
+      const cache_id = md5(me.email);
+      me.password = false;
+      cache.set(`me:${cache_id}`, JSON.stringify(me), "EX", 3600)
 
       return me || {};
     },
