@@ -1,7 +1,5 @@
 import React from "react";
 import GeneralLayout from "../Layouts/GeneralLayout";
-import Container from "../core/Container";
-import Hero from "../core/Hero";
 
 const LoginPage = () => {
   return (
