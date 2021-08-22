@@ -14,6 +14,7 @@ module.exports = {
   USER_EXISTS: "Existing user",
   USER_NOT_EXIST: "User does not exist",
   LOGIN_INVALID: "Invalid login",
+  YOU_ARE_NOT_AUTH: "You are not authenticated",
 
   INCORRECT_PASSWORD: "Wrong password", // "Incorrect password"
   PASSWORD_TOO_SHORT: `Password too short: ${passwordMinLength} characters at least`,
