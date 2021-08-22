@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
+const { BaseRedisCache } = require('apollo-server-cache-redis');
+const Redis = require('ioredis');
 const morgan = require("morgan");
 const cors = require("cors");
 
@@ -21,13 +23,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.disable("x-powered-by");
 
+const redis = new Redis({
+  host: process.env.REDIS_HOST,
+  port: process.env.REDIS_PORT,
+  //password: process.env.REDIS_PASSWORD,
+  db: 1
+});
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  cache: new BaseRedisCache({
+    client: redis,
+  }),
   context: ({ req }) => {
     const token = getToken(req);
     const ip = getIPAdress(req);
-    return { user: getUser(token), ip };
+    return {
+      cache: redis,
+      user: getUser(token),
+      ip,
+    };
   },
   introspection: true,
   playground: true,
