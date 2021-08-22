@@ -9,6 +9,7 @@
     "test": "jest src/tests",
     "start": "node src/server.js",
     "start:dev": "nodemon src/server --exec babel-node -e js",
+    "start:redis-dev": "DEBUG=ioredis:* nodemon src/server --exec babel-node -e js",
     "lint": "eslint .",
     "debug": "nodemon --inspect=0.0.0.0:9229 src/server.js"
   },
@@ -20,6 +21,7 @@
   "dependencies": {
     "amqplib": "^0.7.1",
     "apollo-server": "^2.21.1",
+    "apollo-server-cache-redis": "^3.0.3",
     "apollo-server-express": "^2.21.1",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
@@ -29,7 +31,9 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql": "^15.5.0",
+    "ioredis": "^4.27.8",
     "jsonwebtoken": "^8.5.1",
+    "md5": "^2.3.0",
     "morgan": "^1.10.0",
     "nodemailer": "^6.5.0",
     "nodemon": "^2.0.7",
