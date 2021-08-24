@@ -22,8 +22,7 @@ module.exports = {
 
   USER_NOT_VALIDATED: "User is not validated",
   USER_ALREADY_VALIDATED: "User is already validated",
-};
 
-/**
- * "No user with that email"
- */
+  SESSI0N_EXPIRED: "Your session expired. Sign in again.",
+  NO_USER: "No user with this email address or username has been found.",
+};
