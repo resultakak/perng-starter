@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import md5 from "md5";
 const { v4: uuidv4 } = require("uuid");
 
-import config from "./../config";
+import config, { cache_time } from "./../config";
 const { errors } = require("./../lib");
 import { User } from "../models";
 
@@ -25,6 +25,8 @@ const resolvers = {
         throw new UserInputError(errors.YOU_ARE_NOT_AUTH);
       }
 
+      console.log("user:me", user);
+
       const cache_id = md5(user.email);
 
       let control = await cache.get(`me:${cache_id}`)
@@ -38,7 +40,7 @@ const resolvers = {
       }
 
       user.password = false;
-      cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", 3600)
+      cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", cache_time.me)
 
       return user;
     },
@@ -86,7 +88,7 @@ const resolvers = {
 
         const cache_id = md5(user.email);
         user.password = false;
-        cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", 3600)
+        cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", config.cache_time.me)
 
         return {
           token,
@@ -120,7 +122,7 @@ const resolvers = {
 
         const cache_id = md5(user.email);
         user.password = false;
-        cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", 3600)
+        cache.set(`me:${cache_id}`, JSON.stringify(user), "EX", cache_time.me)
 
         return {
           token, user,
@@ -150,7 +152,7 @@ const resolvers = {
 
       const cache_id = md5(me.email);
       me.password = false;
-      cache.set(`me:${cache_id}`, JSON.stringify(me), "EX", 3600)
+      cache.set(`me:${cache_id}`, JSON.stringify(me), "EX", cache_time.me)
 
       return me || {};
     },
