@@ -1,10 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
-const { BaseRedisCache } = require('apollo-server-cache-redis');
-const Redis = require('ioredis');
+const { BaseRedisCache } = require("apollo-server-cache-redis");
+const Redis = require("ioredis");
 const morgan = require("morgan");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+const helmet = require("helmet");
 
 const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
@@ -16,18 +19,20 @@ const {
 
 const app = express();
 
+app.use(helmet());
 app.use(cors());
 app.options("*", cors());
-app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(morgan("dev"));
 app.disable("x-powered-by");
 
 const redis = new Redis({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT,
   //password: process.env.REDIS_PASSWORD,
-  db: 1
+  db: 1,
 });
 
 const server = new ApolloServer({
@@ -47,9 +52,18 @@ const server = new ApolloServer({
   },
   introspection: true,
   playground: true,
+  formatError: error => {
+    const message = error.message.replace("SequelizeValidationError: ", "").
+      replace("Validation error: ", "");
+
+    return {
+      ...error,
+      message,
+    };
+  },
 });
 
-server.applyMiddleware({ app });
+server.applyMiddleware({ app, path: "/" });
 
 app.use((req, res) => {
   res.status(200);
