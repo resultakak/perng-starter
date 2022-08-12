@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "amqplib": "^0.7.1",
-    "apollo-server": "^2.21.1",
+    "apollo-server": "^3.10.1",
     "apollo-server-cache-redis": "^3.0.3",
     "apollo-server-express": "^2.21.1",
     "axios": "^0.21.1",
